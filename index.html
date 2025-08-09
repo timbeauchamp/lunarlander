@@ -1,15 +1,28 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <title>Lunar Lander</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Text-Based Lunar Lander</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script type="module" src="./index.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      background: #f9fafb;
+      color: #111827;
+    }
+    #root {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 1rem;
+      min-height: 100vh;
+    }
+  </style>
 </head>
 <body>
-    <canvas id="gameCanvas" width="800" height="600"></canvas>
-    <div id="controls">
-        <p>Use ARROW KEYS to control the lander</p>
-        <p>↑ - Thrust | ← → - Rotate</p>
-    </div>
-    <script src="scripts.js"></script>
+  <div id="root"></div>
 </body>
 </html>
