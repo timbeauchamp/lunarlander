@@ -185,7 +185,35 @@ function render() {
     ctx.translate(lander.x, lander.y);
     ctx.rotate(lander.angle);
     
-    // Lander body
+    // Lander body (rocket shape)
+    ctx.beginPath();
+    // Rocket body
+    ctx.moveTo(-6, 10); // bottom left
+    ctx.lineTo(-6, -8); // up left side
+    ctx.lineTo(0, -lander.size); // tip
+    ctx.lineTo(6, -8); // up right side
+    ctx.lineTo(6, 10); // bottom right
+    ctx.closePath();
+    ctx.fillStyle = '#ffffff';
+    ctx.fill();
+
+    // Left fin
+    ctx.beginPath();
+    ctx.moveTo(-6, 10);
+    ctx.lineTo(-12, 16);
+    ctx.lineTo(-3, 12);
+    ctx.closePath();
+    ctx.fillStyle = '#ff3333';
+    ctx.fill();
+
+    // Right fin
+    ctx.beginPath();
+    ctx.moveTo(6, 10);
+    ctx.lineTo(12, 16);
+    ctx.lineTo(3, 12);
+    ctx.closePath();
+    ctx.fillStyle = '#ff3333';
+    ctx.fill();
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(-lander.size/2, -lander.size/2, lander.size, lander.size);
     
