@@ -156,6 +156,10 @@ export default function LunarLander() {
   const log = _log[0];
   const setLog = _log[1];
 
+  const _howToPlayOpen = useState(false);
+  const howToPlayOpen = _howToPlayOpen[0];
+  const setHowToPlayOpen = _howToPlayOpen[1];
+
   const inputRef = useRef(null);
 
   const throttleFraction = useMemo(function () {
@@ -393,101 +397,119 @@ export default function LunarLander() {
           )
         )
       ),
-      // Right panel (Tuning)
+      // Right panel (How to Play + Tuning)
       React.createElement(
         "div",
         { className: "lg:col-span-1" },
         React.createElement(
           "div",
-          { className: "rounded-2xl shadow-sm bg-white border border-zinc-200 p-5 sticky top-6" },
-          React.createElement("h3", { className: "text-lg font-semibold mb-3" }, "Tuning"),
-          React.createElement(
-            "p",
-            { className: "text-xs text-zinc-600 mb-4" },
-            "Adjust the scenario to taste. Try higher initial altitude, lower fuel, or a meaner Moon."
-          ),
-          React.createElement(Tuner, {
-            label: "Time step (s)",
-            value: params.dt,
-            min: 1,
-            max: 60,
-            step: 1,
-            onChange: function (v) { setParams(Object.assign({}, params, { dt: v })); },
-          }),
-          React.createElement(Tuner, {
-            label: "Lunar gravity g (m/s²)",
-            value: params.g,
-            min: 0.5,
-            max: 3,
-            step: 0.01,
-            onChange: function (v) { setParams(Object.assign({}, params, { g: v })); },
-          }),
-          React.createElement(Tuner, {
-            label: "Max upward accel (m/s²)",
-            value: params.aThrustMax,
-            min: 1,
-            max: 15,
-            step: 0.1,
-            onChange: function (v) { setParams(Object.assign({}, params, { aThrustMax: v })); },
-          }),
-          React.createElement(Tuner, {
-            label: "Start altitude (m)",
-            value: params.altitude0,
-            min: 100,
-            max: 20000,
-            step: 50,
-            onChange: function (v) { setParams(Object.assign({}, params, { altitude0: v })); },
-          }),
-          React.createElement(Tuner, {
-            label: "Start velocity down (m/s)",
-            value: params.velocity0,
-            min: -50,
-            max: 200,
-            step: 1,
-            onChange: function (v) { setParams(Object.assign({}, params, { velocity0: v })); },
-          }),
-          React.createElement(Tuner, {
-            label: "Fuel (units)",
-            value: params.fuel0,
-            min: 0,
-            max: 5000,
-            step: 10,
-            onChange: function (v) { setParams(Object.assign({}, params, { fuel0: v })); },
-          }),
-          React.createElement(Tuner, {
-            label: "Max burn per turn",
-            value: params.maxBurn,
-            min: 10,
-            max: 2000,
-            step: 10,
-            onChange: function (v) { setParams(Object.assign({}, params, { maxBurn: v })); },
-          }),
-          React.createElement(Tuner, {
-            label: "Safe landing speed (m/s)",
-            value: params.landingSpeedSafe,
-            min: 0.5,
-            max: 10,
-            step: 0.1,
-            onChange: function (v) { setParams(Object.assign({}, params, { landingSpeedSafe: v })); },
-          }),
+          { className: "rounded-2xl shadow-sm bg-white border border-zinc-200 p-5 sticky top-6 max-h-[calc(100vh-3rem)] overflow-y-auto" },
+          // How to Play (collapsible, at top)
           React.createElement(
             "div",
-            { className: "mt-4 text-xs text-zinc-600" },
-            "Tip: For a more \"classic\" feel, try dt=10, altitude=240, velocity=40, fuel=1200, max burn=200, aMax≈6."
-          )
-        ),
-        React.createElement(
-          "div",
-          { className: "rounded-2xl shadow-sm bg-white border border-zinc-200 p-5 mt-6" },
-          React.createElement("h3", { className: "text-lg font-semibold mb-2" }, "How to Play"),
+            { className: "mb-6" },
+            React.createElement(
+              "button",
+              {
+                onClick: function () { setHowToPlayOpen(!howToPlayOpen); },
+                className: "w-full flex items-center justify-between text-lg font-semibold mb-2 hover:text-indigo-600 transition-colors",
+              },
+              "How to Play",
+              React.createElement(
+                "span",
+                { className: "text-sm" },
+                howToPlayOpen ? "−" : "+"
+              )
+            ),
+            howToPlayOpen && React.createElement(
+              "ol",
+              { className: "list-decimal pl-5 text-sm space-y-1 text-zinc-700" },
+              React.createElement("li", null, "Check your altitude, velocity (down is positive), and remaining fuel."),
+              React.createElement("li", null, "Enter a ", React.createElement("span", { className: "font-mono" }, "Burn"), " for this ", String(params.dt), "s turn (0–", String(params.maxBurn), ")."),
+              React.createElement("li", null, "Higher burn = more upward thrust. You cannot burn more than your remaining fuel."),
+              React.createElement("li", null, "Land at ≤ ", params.landingSpeedSafe.toFixed(1), " m/s for a safe touchdown."),
+              React.createElement("li", null, "If fuel runs out, you free‑fall (g only). Good luck, Captain."),
+            )
+          ),
+          // Tuning section
           React.createElement(
-            "ol",
-            { className: "list-decimal pl-5 text-sm space-y-1 text-zinc-700" },
-            React.createElement("li", null, "Check your altitude, velocity (down is positive), and remaining fuel."),
-            React.createElement("li", null, "Enter a ", React.createElement("span", { className: "font-mono" }, "Burn"), " for this ", String(params.dt), "s turn (0–", String(params.maxBurn), ")."),
-            React.createElement("li", null, "Higher burn = more upward thrust. You cannot burn more than your remaining fuel."),
-            React.createElement("li", null, "Land at ≤ ", params.landingSpeedSafe.toFixed(1), " m/s for a safe touchdown."),
-            React.createElement("li", null, "If fuel runs out, you free‑fall (g only). Good luck, Captain."),
+            "div",
+            { className: "border-t border-zinc-200 pt-4" },
+            React.createElement("h3", { className: "text-lg font-semibold mb-3" }, "Tuning"),
+            React.createElement(
+              "p",
+              { className: "text-xs text-zinc-600 mb-4" },
+              "Adjust the scenario to taste. Try higher initial altitude, lower fuel, or a meaner Moon."
+            ),
+            React.createElement(Tuner, {
+              label: "Time step (s)",
+              value: params.dt,
+              min: 1,
+              max: 60,
+              step: 1,
+              onChange: function (v) { setParams(Object.assign({}, params, { dt: v })); },
+            }),
+            React.createElement(Tuner, {
+              label: "Lunar gravity g (m/s²)",
+              value: params.g,
+              min: 0.5,
+              max: 3,
+              step: 0.01,
+              onChange: function (v) { setParams(Object.assign({}, params, { g: v })); },
+            }),
+            React.createElement(Tuner, {
+              label: "Max upward accel (m/s²)",
+              value: params.aThrustMax,
+              min: 1,
+              max: 15,
+              step: 0.1,
+              onChange: function (v) { setParams(Object.assign({}, params, { aThrustMax: v })); },
+            }),
+            React.createElement(Tuner, {
+              label: "Start altitude (m)",
+              value: params.altitude0,
+              min: 100,
+              max: 20000,
+              step: 50,
+              onChange: function (v) { setParams(Object.assign({}, params, { altitude0: v })); },
+            }),
+            React.createElement(Tuner, {
+              label: "Start velocity down (m/s)",
+              value: params.velocity0,
+              min: -50,
+              max: 200,
+              step: 1,
+              onChange: function (v) { setParams(Object.assign({}, params, { velocity0: v })); },
+            }),
+            React.createElement(Tuner, {
+              label: "Fuel (units)",
+              value: params.fuel0,
+              min: 0,
+              max: 5000,
+              step: 10,
+              onChange: function (v) { setParams(Object.assign({}, params, { fuel0: v })); },
+            }),
+            React.createElement(Tuner, {
+              label: "Max burn per turn",
+              value: params.maxBurn,
+              min: 10,
+              max: 2000,
+              step: 10,
+              onChange: function (v) { setParams(Object.assign({}, params, { maxBurn: v })); },
+            }),
+            React.createElement(Tuner, {
+              label: "Safe landing speed (m/s)",
+              value: params.landingSpeedSafe,
+              min: 0.5,
+              max: 10,
+              step: 0.1,
+              onChange: function (v) { setParams(Object.assign({}, params, { landingSpeedSafe: v })); },
+            }),
+            React.createElement(
+              "div",
+              { className: "mt-4 text-xs text-zinc-600" },
+              "Tip: For a more \"classic\" feel, try dt=10, altitude=240, velocity=40, fuel=1200, max burn=200, aMax≈6."
+            )
           )
         )
       )
