@@ -35,23 +35,30 @@ function formatFuel(f) {
 }
 
 function interpolateTouchdown(h, vDown, aNet, dt) {
-  // Solve v*tc + 0.5*a*tc^2 = h for tc in (0, dt]
+  // Solve 0.5*a*t^2 + v*t - h = 0 for t in (0, dt]
   var A = 0.5 * aNet;
   var B = vDown;
-  var C = -h;
+  var C = -h; // <-- key fix
+
   var tContact = null;
+
   if (Math.abs(A) < 1e-8) {
-    if (B > 0) tContact = h / B;
+    // Linear: h - v*t = 0  =>  t = h / v
+    if (B > 1e-8) {
+      var t = h / B; // <-- not -h/B
+      if (t > 0 && t <= dt) tContact = t;
+    }
   } else {
     var disc = B * B - 4 * A * C;
     if (disc >= 0) {
       var sqrt = Math.sqrt(disc);
       var t1 = (-B + sqrt) / (2 * A);
       var t2 = (-B - sqrt) / (2 * A);
-      var candidates = [t1, t2].filter(function (t) { return t >= 0 && t <= dt; });
+      var candidates = [t1, t2].filter(function (t) { return t > 0 && t <= dt; });
       if (candidates.length) tContact = Math.min.apply(null, candidates);
     }
   }
+
   if (tContact == null) return null;
   var vAtContact = vDown + aNet * tContact;
   return { tContact: tContact, vAtContact: vAtContact };
@@ -204,6 +211,19 @@ export default function LunarLander() {
 
   function stepOnce() {
     if (!canSubmit) return;
+    
+    // Check if we're already on the ground
+    if (altitude <= 0) {
+      if (Math.abs(velocityDown) <= params.landingSpeedSafe) {
+        setStatus("landed");
+        pushLog("TOUCHDOWN — SAFE LANDING! Vertical speed: " + formatSpeed(velocityDown));
+      } else {
+        setStatus("crashed");
+        pushLog("IMPACT — CRASH. Vertical speed: " + formatSpeed(velocityDown));
+      }
+      return;
+    }
+    
     var b = clamp(Math.round(burn), 0, params.maxBurn);
     var fuelAfter = Math.max(0, fuel - b);
     var throttle = params.maxBurn > 0 ? b / params.maxBurn : 0;
