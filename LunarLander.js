@@ -49,8 +49,11 @@ function interpolateTouchdown(h, vDown, aNet, dt) {
       if (t > 0 && t <= dt) tContact = t;
     }
   } else {
+
     var disc = B * B - 4 * A * C;
-    if (disc >= 0) {
+    // Guard against tiny negative due to FP error
+    if (disc < 0 && disc > -1e-12) disc = 0;
+      if (disc >= 0) {
       var sqrt = Math.sqrt(disc);
       var t1 = (-B + sqrt) / (2 * A);
       var t2 = (-B - sqrt) / (2 * A);
@@ -183,7 +186,8 @@ export default function LunarLander() {
     return params.g - aUp; // down-positive
   }, [params.g, params.aThrustMax, throttleFraction]);
 
-  const canSubmit = status === "flying" && altitude > 0;
+// Allow steps in free-fall after fuel runs out
+  const canSubmit = (status === "flying" || status === "out_of_fuel") && altitude > 0;
 
   function pushLog(line) {
     setLog(function (prev) { return [line].concat(prev).slice(0, 200); });
