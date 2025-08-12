@@ -207,12 +207,22 @@ export default function LunarLander() {
     var a = params.g - aUp; // down-positive
     var dt = params.dt;
 
+    // Log the burn first, before we check for touchdown
+    var initialTime = time;
+    var burnLogLine = "T+" + (initialTime + dt) + "s | Burn=" + b;
+    if (fuel <= 0 && b > 0) burnLogLine += " (No fuel to burn!)";
+
     if (altitude > 0) {
       var touchdown = interpolateTouchdown(altitude, velocityDown, a, dt);
       if (touchdown) {
         var tContact = touchdown.tContact;
         var vAtContact = touchdown.vAtContact;
         var newTime = time + tContact;
+        
+        // Log the partial burn for the time until touchdown
+        var partialBurnLog = "T+" + newTime.toFixed(1) + "s | Burn=" + b + " (partial) | Contact imminent";
+        pushLog(partialBurnLog);
+        
         setTime(newTime);
         setAltitude(0);
         setVelocityDown(vAtContact);
@@ -237,8 +247,7 @@ export default function LunarLander() {
     setVelocityDown(v1);
     setFuel(fuelAfter);
 
-    var line = "T+" + newTime2 + "s | Burn=" + b + " | Alt=" + formatMeters(h1) + " | Vel=" + formatSpeed(v1) + " | Fuel=" + formatFuel(fuelAfter);
-    if (fuel <= 0 && b > 0) line += "  (No fuel to burn!)";
+    var line = burnLogLine + " | Alt=" + formatMeters(h1) + " | Vel=" + formatSpeed(v1) + " | Fuel=" + formatFuel(fuelAfter);
     if (fuelAfter <= 0 && status === "flying") {
       setStatus("out_of_fuel");
       pushLog("WARNING: Fuel exhausted. You are in ballistic descent.");
