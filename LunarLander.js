@@ -579,6 +579,7 @@ export default function LunarLander() {
               {
                 onClick: function () { setAboutOpen(!aboutOpen); },
                 className: "w-full flex items-center justify-between text-lg font-semibold mb-3 hover:text-indigo-600 transition-colors",
+                title: "© 1969–2025 Lunar Lander lineage — PDP-8 ➜ BASIC ➜ JavaScript ➜ Web"
               },
               "About Lunar Lander",
               React.createElement(
@@ -589,13 +590,106 @@ export default function LunarLander() {
             ),
             aboutOpen && React.createElement(
               "div",
-              null,
+              { className: "space-y-3" },
               React.createElement(
                 "p",
                 { className: "text-sm text-zinc-700" },
                 "This is a text-based simulation inspired by the classic Lunar Lander games and Apollo-era guidance. Adjust parameters, manage your fuel, and land safely on the Moon! Built with React, no JSX, and styled with Tailwind."
+              ),
+              React.createElement(
+                "div",
+                { className: "text-xs text-zinc-700 bg-zinc-50 border border-zinc-200 rounded-xl p-3 flex gap-3" },
+                // Inline PDP-8 front panel SVG icon
+                React.createElement(
+                  "svg",
+                  {
+                    xmlns: "http://www.w3.org/2000/svg",
+                    viewBox: "0 0 160 40",
+                    width: "80",
+                    height: "20",
+                    role: "img",
+                    "aria-label": "DEC PDP-8 front panel"
+                  },
+                  React.createElement("rect", { x: 0, y: 0, width: 160, height: 40, rx: 4, fill: "#0f172a" }),
+                  [0, 1, 2, 3, 4, 5, 6, 7].map(function(i){
+                    return React.createElement("circle", {
+                      key: "lampL"+i,
+                      cx: 12 + i*10,
+                      cy: 12,
+                      r: 2.5,
+                      fill: i%2===0 ? "#ef4444" : "#7f1d1d"
+                    });
+                  }),
+                  [0,1,2,3,4,5,6,7].map(function(i){
+                    var x = 60 + i*10;
+                    return React.createElement("g", { key: "tog"+i },
+                      React.createElement("rect", { x: x-3, y: 8, width: 6, height: 16, rx: 1, fill: "#e5e7eb" }),
+                      React.createElement("rect", { x: x-2, y: 12 + (i%2?2:-2), width: 4, height: 6, rx: 0.5, fill: "#9ca3af" })
+                    );
+                  }),
+                  [0, 1, 2, 3, 4, 5].map(function(i){
+                    return React.createElement("circle", {
+                      key: "lampR"+i,
+                      cx: 140 + i*3.5,
+                      cy: 12,
+                      r: 2,
+                      fill: i%2? "#ef4444" : "#7f1d1d"
+                    });
+                  }),
+                  React.createElement("text", {
+                    x: 8,
+                    y: 32,
+                    fill: "#e5e7eb",
+                    style: { fontSize: "6px", fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace" }
+                  }, "DEC PDP-8")
+                ),
+                React.createElement(
+                  "div",
+                  null,
+                  React.createElement(
+                    "div",
+                    { className: "font-semibold text-zinc-900 mb-1" },
+                    "Homage to the Original Creator"
+                  ),
+                  React.createElement(
+                    "p",
+                    null,
+                    "In the fall of 1969, just months after Apollo 11’s descent, ",
+                    React.createElement("strong", null, "Jim Storer"),
+                    ", a 17-year-old high school student at Lexington High School (MA), wrote the first text-based Lunar Lander game in ",
+                    React.createElement("em", null, "FOCAL"),
+                    " for a DEC PDP-8. His code was later published by DEC and adapted into BASIC by David Ahl for the landmark 1973 book ",
+                    React.createElement("em", null, "101 BASIC Computer Games"),
+                    "."
+                  ),
+                  React.createElement(
+                    "p",
+                    null,
+                    "This project tips its helmet to that lineage — from teletype and toggles to web browsers and JavaScript — proof that the Moon can be reached with math, curiosity, and a little stubbornness."
+                  ),
+                  React.createElement(
+                    "p",
+                    null,
+                    React.createElement(
+                      "a",
+                      {
+                        href: "https://technologizer.com/2009/07/19/lunar-lander/",
+                        target: "_blank",
+                        rel: "noopener noreferrer",
+                        className: "text-indigo-600 hover:underline"
+                      },
+                      "Learn more about the original game"
+                    )
+                  )
+                )
               )
             )
+          ),
+          // Footer nerd points
+          React.createElement(
+            "div",
+            { className: "text-center text-[10px] text-zinc-500 mt-6" },
+            "© 1969–2025 Lunar Lander lineage — PDP-8 ➜ BASIC ➜ JavaScript ➜ Web"
           )
         )
       )
