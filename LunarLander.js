@@ -174,6 +174,10 @@ export default function LunarLander() {
   const tuningOpen = _tuningOpen[0];
   const setTuningOpen = _tuningOpen[1];
 
+  const _aboutOpen = useState(false);
+  const aboutOpen = _aboutOpen[0];
+  const setAboutOpen = _aboutOpen[1];
+
   const inputRef = useRef(null);
 
   const throttleFraction = useMemo(function () {
@@ -465,7 +469,9 @@ export default function LunarLander() {
               React.createElement("li", null, "Enter a ", React.createElement("span", { className: "font-mono" }, "Burn"), " for this ", String(params.dt), "s turn (0–", String(params.maxBurn), ")."),
               React.createElement("li", null, "Higher burn = more upward thrust. You cannot burn more than your remaining fuel."),
               React.createElement("li", null, "Land at ≤ ", params.landingSpeedSafe.toFixed(1), " m/s for a safe touchdown."),
-              React.createElement("li", null, "If fuel runs out, you free‑fall (g only). Good luck, Captain."),
+              React.createElement("li", null, "Hint on Hints: Don't use them, they are mostly useless."),
+              React.createElement("li", null, "Useful hint: At default gravity, a fuel burn of 54 pretty much results in an upward acceleration equal to gravity."),
+              React.createElement("li", null, "If fuel runs out, you free‑fall (g only). Good luck, Captain.")
             )
           ),
           // Tuning section (collapsible)
@@ -561,6 +567,33 @@ export default function LunarLander() {
                 "div",
                 { className: "mt-4 text-xs text-zinc-600" },
                 "Tip: For a more \"classic\" feel, try dt=10, altitude=240, velocity=40, fuel=1200, max burn=200, aMax≈6."
+              )
+            )
+          ),
+          // About Lunar Lander section (collapsible)
+          React.createElement(
+            "div",
+            { className: "border-t border-zinc-200 pt-4 mt-6" },
+            React.createElement(
+              "button",
+              {
+                onClick: function () { setAboutOpen(!aboutOpen); },
+                className: "w-full flex items-center justify-between text-lg font-semibold mb-3 hover:text-indigo-600 transition-colors",
+              },
+              "About Lunar Lander",
+              React.createElement(
+                "span",
+                { className: "text-sm" },
+                aboutOpen ? "−" : "+"
+              )
+            ),
+            aboutOpen && React.createElement(
+              "div",
+              null,
+              React.createElement(
+                "p",
+                { className: "text-sm text-zinc-700" },
+                "This is a text-based simulation inspired by the classic Lunar Lander games and Apollo-era guidance. Adjust parameters, manage your fuel, and land safely on the Moon! Built with React, no JSX, and styled with Tailwind."
               )
             )
           )

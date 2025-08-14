@@ -1,0 +1,12 @@
+{
+  "name": "lunarlander",
+  "version": "1.0.0",
+  "description": "Lunar Lander game with physics and unit tests",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}
