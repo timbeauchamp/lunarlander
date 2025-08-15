@@ -1,4 +1,4 @@
-// LunarLander.js — Plain JS (no JSX, no TypeScript), React.createElement only
+// LunarLander.js — Plain JS, React.createElement only
 // Requires: index.html that loads Tailwind (optional styling), and index.js that renders this component.
 // Imports React as an ES module so the browser can run it directly.
 
@@ -471,7 +471,7 @@ export default function LunarLander() {
               React.createElement("li", null, "Land at ≤ ", params.landingSpeedSafe.toFixed(1), " m/s for a safe touchdown."),
               React.createElement("li", null, "Hint on Hints: Don't use them, they are mostly useless."),
               React.createElement("li", null, "Useful hint: At default gravity, a fuel burn of 54 pretty much results in an upward acceleration equal to gravity."),
-              React.createElement("li", null, "If fuel runs out, you free‑fall (g only). Good luck, Captain.")
+              React.createElement("li", null, "If fuel runs out, you free‑fall (g only). Good luck, Commander.")
             )
           ),
           // Tuning section (collapsible)
@@ -594,7 +594,7 @@ export default function LunarLander() {
               React.createElement(
                 "p",
                 { className: "text-sm text-zinc-700" },
-                "This is a text-based simulation inspired by the classic Lunar Lander games and Apollo-era guidance. Adjust parameters, manage your fuel, and land safely on the Moon! Built with React, no JSX, and styled with Tailwind."
+                "This is a text-based simulation inspired by the classic Lunar Lander games and Apollo-era guidance. Adjust parameters, manage your fuel, and land safely on the Moon! Built with React, and styled with Tailwind."
               ),
               React.createElement(
                 "div",
