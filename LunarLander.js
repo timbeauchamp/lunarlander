@@ -218,9 +218,9 @@ export default function LunarLander() {
   useEffect(function () { reset(true); }, []);
 
   function stepOnce() {
-    if (!canSubmit) return;
-    
-    // Check if we're already on the ground
+    if (!( (status === "flying" || status === "out_of_fuel") && altitude > 0 )) return;
+
+    // Already on ground guard (rare, but safe)
     if (altitude <= 0) {
       if (Math.abs(velocityDown) <= params.landingSpeedSafe) {
         setStatus("landed");
@@ -231,60 +231,118 @@ export default function LunarLander() {
       }
       return;
     }
-    
-    var b = clamp(Math.round(burn), 0, params.maxBurn);
-    var fuelAfter = Math.max(0, fuel - b);
-    var throttle = params.maxBurn > 0 ? b / params.maxBurn : 0;
-    var aUp = params.aThrustMax * throttle;
-    var a = params.g - aUp; // down-positive
+
     var dt = params.dt;
+    var bRequested = clamp(Math.round(burn), 0, params.maxBurn);
+    var bActual = Math.min(bRequested, Math.max(0, fuel)); // cap by available fuel
+    var throttle = params.maxBurn > 0 ? bActual / params.maxBurn : 0;
+    var aUp = params.aThrustMax * throttle;
+    var aBurn = params.g - aUp;    // during burn (down-positive)
+    var aCoast = params.g;         // after fuel is gone
 
-    // Log the burn first, before we check for touchdown
-    var initialTime = time;
-    var burnLogLine = "T+" + (initialTime + dt) + "s | Burn=" + b;
-    if (fuel <= 0 && b > 0) burnLogLine += " (No fuel to burn!)";
+    // If we don't have enough fuel for the whole step at the requested rate,
+    // burn lasts for a fraction of the time, then we coast.
+    // Burn fraction = bActual / bRequested (if bRequested > 0)
+    var burnFrac = (bRequested > 0) ? (bActual / bRequested) : 0;
+    burnFrac = Math.max(0, Math.min(1, burnFrac));
+    var tBurn = dt * burnFrac;         // time under thrust
+    var tCoast = dt - tBurn;           // remaining time (may be 0)
 
-    if (altitude > 0) {
-      var touchdown = interpolateTouchdown(altitude, velocityDown, a, dt);
-      if (touchdown) {
-        var tContact = touchdown.tContact;
-        var vAtContact = touchdown.vAtContact;
-        var newTime = time + tContact;
-        
-        // Log the partial burn for the time until touchdown
-        var partialBurnLog = "T+" + newTime.toFixed(1) + "s | Burn=" + b + " (partial) | Contact imminent";
-        pushLog(partialBurnLog);
-        
-        setTime(newTime);
-        setAltitude(0);
-        setVelocityDown(vAtContact);
-        setFuel(fuelAfter);
-        if (Math.abs(vAtContact) <= params.landingSpeedSafe) {
-          setStatus("landed");
-          pushLog("TOUCHDOWN at T+" + newTime.toFixed(1) + "s — SAFE LANDING! Vertical speed: " + formatSpeed(vAtContact));
-        } else {
-          setStatus("crashed");
-          pushLog("IMPACT at T+" + newTime.toFixed(1) + "s — CRASH. Vertical speed: " + formatSpeed(vAtContact));
-        }
-        return;
+    // Helper to finish the turn with a touchdown result
+    function finishAtContact(tContact, vAtContact, fuelUsed) {
+      var newTime = time + tContact;
+      setTime(newTime);
+      setAltitude(0);
+      setVelocityDown(vAtContact);
+      setFuel(Math.max(0, fuel - fuelUsed));
+      if (Math.abs(vAtContact) <= params.landingSpeedSafe) {
+        setStatus("landed");
+        pushLog("TOUCHDOWN at T+" + newTime.toFixed(1) + "s — SAFE LANDING! Vertical speed: " + formatSpeed(vAtContact) +
+                " | Fuel used: " + fuelUsed.toFixed(1) + "u");
+      } else {
+        setStatus("crashed");
+        pushLog("IMPACT at T+" + newTime.toFixed(1) + "s — CRASH. Vertical speed: " + formatSpeed(vAtContact) +
+                " | Fuel used: " + fuelUsed.toFixed(1) + "u");
       }
     }
 
-    // advance full dt
-    var v1 = velocityDown + a * dt;
-    var h1 = altitude - velocityDown * dt - 0.5 * a * dt * dt;
-    var newTime2 = time + dt;
-    setTime(newTime2);
-    setAltitude(h1);
-    setVelocityDown(v1);
-    setFuel(fuelAfter);
+    // Phase 1: Burn (0 → tBurn) — only if tBurn > 0
+    if (tBurn > 0) {
+      var contact1 = interpolateTouchdown(altitude, velocityDown, aBurn, tBurn);
+      if (contact1) {
+        // Touchdown happens during burning portion
+        var fuelUsed1 = bActual * (contact1.tContact / tBurn); // proportion of bActual consumed
+        return finishAtContact(contact1.tContact, contact1.vAtContact, fuelUsed1);
+      }
 
-    var line = burnLogLine + " | Alt=" + formatMeters(h1) + " | Vel=" + formatSpeed(v1) + " | Fuel=" + formatFuel(fuelAfter);
-    if (fuelAfter <= 0 && status === "flying") {
+      // No touchdown in burn phase: integrate to end of burn
+      var v_afterBurn = velocityDown + aBurn * tBurn;
+      var h_afterBurn = altitude - (velocityDown * tBurn) - 0.5 * aBurn * tBurn * tBurn;
+      var fuel_afterBurn = Math.max(0, fuel - bActual);
+
+      // Phase 2: Coast (tBurn → dt) — only if tCoast > 0
+      if (tCoast > 0) {
+        var contact2 = interpolateTouchdown(h_afterBurn, v_afterBurn, aCoast, tCoast);
+        if (contact2) {
+          var fuelUsedTotal = bActual; // all burn happened before contact in this scenario
+          return finishAtContact(tBurn + contact2.tContact, contact2.vAtContact, fuelUsedTotal);
+        }
+
+        // No touchdown in either phase: finalize state at end of full dt
+        var v_end = v_afterBurn + aCoast * tCoast;
+        var h_end = h_afterBurn - (v_afterBurn * tCoast) - 0.5 * aCoast * tCoast * tCoast;
+        var t_end = time + dt;
+        setTime(t_end);
+        setAltitude(h_end);
+        setVelocityDown(v_end);
+        setFuel(fuel_afterBurn);
+
+        var line = "T+" + t_end + "s | Burn=" + bActual + " (req=" + bRequested + ") | Alt=" + formatMeters(h_end) +
+                  " | Vel=" + formatSpeed(v_end) + " | Fuel=" + formatFuel(fuel_afterBurn);
+        if (fuel_afterBurn <= 0 && status === "flying" && h_end > 0) {
+          setStatus("out_of_fuel");
+          pushLog("WARNING: Fuel exhausted. You are in ballistic descent.");
+        }
+        return pushLog(line);
+      } else {
+        // Entire step was burn, no touchdown
+        var v_endB = velocityDown + aBurn * dt;
+        var h_endB = altitude - (velocityDown * dt) - 0.5 * aBurn * dt * dt;
+        var t_endB = time + dt;
+        setTime(t_endB);
+        setAltitude(h_endB);
+        setVelocityDown(v_endB);
+        setFuel(fuel_afterBurn);
+
+        var lineB = "T+" + t_endB + "s | Burn=" + bActual + " (req=" + bRequested + ") | Alt=" + formatMeters(h_endB) +
+                    " | Vel=" + formatSpeed(v_endB) + " | Fuel=" + formatFuel(fuel_afterBurn);
+        if (fuel_afterBurn <= 0 && status === "flying" && h_endB > 0) {
+          setStatus("out_of_fuel");
+          pushLog("WARNING: Fuel exhausted. You are in ballistic descent.");
+        }
+        return pushLog(lineB);
+      }
+    }
+
+    // tBurn == 0 (no fuel or no requested burn): full coast for dt
+    var contactCoastOnly = interpolateTouchdown(altitude, velocityDown, aCoast, dt);
+    if (contactCoastOnly) {
+      return finishAtContact(contactCoastOnly.tContact, contactCoastOnly.vAtContact, 0);
+    }
+    var v_coast = velocityDown + aCoast * dt;
+    var h_coast = altitude - (velocityDown * dt) - 0.5 * aCoast * dt * dt;
+    var t_coastEnd = time + dt;
+    setTime(t_coastEnd);
+    setAltitude(h_coast);
+    setVelocityDown(v_coast);
+    // fuel unchanged because we didn't burn
+    var logLine = "T+" + t_coastEnd + "s | Burn=0 (req=" + bRequested + ") | Alt=" + formatMeters(h_coast) +
+                  " | Vel=" + formatSpeed(v_coast) + " | Fuel=" + formatFuel(fuel);
+    if (fuel <= 0 && status === "flying" && h_coast > 0) {
       setStatus("out_of_fuel");
       pushLog("WARNING: Fuel exhausted. You are in ballistic descent.");
     }
-    pushLog(line);
+    return pushLog(logLine);
   }
 
   function quickHint() {
