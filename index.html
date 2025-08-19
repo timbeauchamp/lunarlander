@@ -22,12 +22,69 @@
       padding: 1rem;
       min-height: 100vh;
     }
+    /* Retro terminal theme: single foreground color, high contrast */
+    .bg-black.text-green-200,
+    .bg-black.text-green-200 * {
+      color: #9be29b !important; /* single readable green */
+    }
+
+    /* Force black backgrounds for cards, inputs and panels */
+    .bg-black .rounded-2xl,
+    .bg-black .rounded-xl,
+    .bg-black .bg-white,
+    .bg-black .bg-zinc-50,
+    .bg-black .bg-zinc-50\/50 {
+      background: #000 !important;
+      color: #9be29b !important;
+    }
+
+    /* Uniform border color */
+    .bg-black .rounded-2xl,
+    .bg-black .rounded-xl,
+    .bg-black input,
+    .bg-black button,
+    .bg-black .border,
+    .bg-black .border-zinc-200 {
+      border-color: #113311 !important;
+    }
+
+    /* Buttons and inputs: flat black with green text */
+    .bg-black button {
+      background: #000 !important;
+      color: #9be29b !important;
+      border: 1px solid #113311 !important;
+      box-shadow: none !important;
+    }
+
+    .bg-black input,
+    .bg-black textarea,
+    .bg-black .rounded-xl {
+      background: #000 !important;
+      color: #9be29b !important;
+      border: 1px solid #113311 !important;
+    }
+
+    /* Typography: use monospace for authenticity */
+    .bg-black .font-mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', 'Courier New', monospace;
+    }
+
+    /* Reduce intensity variation: force sizes/colors to the single green */
+    .bg-black .text-xs,
+    .bg-black .text-sm,
+    .bg-black .text-lg,
+    .bg-black .text-zinc-600,
+    .bg-black .text-zinc-700,
+    .bg-black .text-zinc-900 {
+      color: #9be29b !important;
+    }
   </style>
 </head>
 <body>
   <div id="root"></div>
   <div style="text-align: center; margin-top: 20px; padding: 20px;">
-    <a href="index-graphic.html" style="color: #059669; text-decoration: none; font-size: 18px; font-weight: 600;">🚀 Try the Enhanced Graphics Version</a>
+    <a href="index-graphic.html" style="color: #059669; text-decoration: none; font-size: 18px; font-weight: 600; margin-right:12px;">🚀 Try the Enhanced Graphics Version</a>
+    <a href="index-ascii.html" style="color: #059669; text-decoration: none; font-size: 18px; font-weight: 600;">🖥️ Try the ASCII Version</a>
   </div>
 </body>
 </html>

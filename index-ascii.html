@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Lunar Lander — ASCII Mode</title>
+  <style>
+    body { background: #0b0b0b; color: #dfe; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Courier New', monospace; padding: 1rem; }
+    .container { max-width: 900px; margin: 0 auto; }
+    pre.ascii { background: #000; color: #9be29b; padding: 12px; border-radius: 6px; font-size: 14px; line-height: 1; }
+    .controls { margin-top: 12px; display:flex; gap:8px; align-items:center; }
+    input[type=number] { width:90px; padding:6px; border-radius:6px; background:#111; color:#9be29b; border:1px solid #113311; }
+    button { padding:6px 10px; border-radius:6px; background:#111; color:#9be29b; border:1px solid #113311; cursor:pointer; }
+    .stats { margin-top:8px; color:#9be29b; }
+    .hint { color:#7fbf7f; font-size:13px; margin-top:6px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>ASCII Lunar Lander</h1>
+    <p class="hint">Keyboard: Enter commits a turn. Use the Hint button for a suggested burn.</p>
+    <pre id="screen" class="ascii" aria-label="ASCII lunar lander screen"></pre>
+
+    <div class="controls">
+      <label for="burn">Burn:</label>
+      <input id="burn" type="number" min="0" step="1" value="0">
+      <button id="commit">Commit Turn</button>
+      <button id="hint">Hint</button>
+      <button id="reset">Reset</button>
+      <label style="margin-left:8px;"><input id="autostep" type="checkbox"> Auto-step</label>
+    </div>
+
+    <div class="stats" id="stats"></div>
+
+    <p style="margin-top:14px;color:#bfe">This ASCII view simulates vertical motion only and maps altitude to rows. It's intentionally simple and lightweight.</p>
+  </div>
+
+  <script src="./ascii.js"></script>
+</body>
+</html>

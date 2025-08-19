@@ -102,6 +102,36 @@ function Tuner(props) {
   );
 }
 
+function ThemeSwitcher(props) {
+  return React.createElement(
+    "div",
+    { className: "mb-4" },
+    React.createElement("div", { className: "text-sm font-medium mb-2" }, "Theme"),
+    React.createElement(
+      "div",
+      { className: "flex gap-2" },
+      React.createElement(
+        "button",
+        {
+          onClick: function () { props.onChange("default"); },
+          className:
+            "rounded-2xl px-3 py-1 text-xs font-medium " + (props.value === "default" ? "bg-indigo-600 text-white" : "bg-zinc-200 text-zinc-900"),
+        },
+        "Default"
+      ),
+      React.createElement(
+        "button",
+        {
+          onClick: function () { props.onChange("retro"); },
+          className:
+            "rounded-2xl px-3 py-1 text-xs font-medium " + (props.value === "retro" ? "bg-green-800 text-green-100" : "bg-zinc-200 text-zinc-900"),
+        },
+        "Retro"
+      )
+    )
+  );
+}
+
 function StatusBanner(props) {
   var title = "Flight in progress";
   var sub = "Keep your vertical speed under " + props.landingSpeedSafe.toFixed(1) + " m/s at touchdown.";
@@ -177,6 +207,10 @@ export default function LunarLander() {
   const _aboutOpen = useState(false);
   const aboutOpen = _aboutOpen[0];
   const setAboutOpen = _aboutOpen[1];
+
+  const _theme = useState("default");
+  const theme = _theme[0];
+  const setTheme = _theme[1];
 
   const inputRef = useRef(null);
 
@@ -357,7 +391,7 @@ export default function LunarLander() {
 
   return React.createElement(
     "div",
-    { className: "min-h-screen w-full bg-zinc-50 text-zinc-900 flex items-start justify-center p-6" },
+    { className: "min-h-screen w-full flex items-start justify-center p-6" + (theme === "default" ? " bg-zinc-50 text-zinc-900" : " bg-black text-green-200 font-mono") },
     React.createElement(
       "div",
       { className: "w-full max-w-5xl grid grid-cols-1 lg:grid-cols-3 gap-6" },
@@ -627,6 +661,12 @@ export default function LunarLander() {
                 "Tip: For a more \"classic\" feel, try dt=10, altitude=240, velocity=40, fuel=1200, max burn=200, aMax≈6."
               )
             )
+          ),
+          // Theme switcher
+          React.createElement(
+            "div",
+            { className: "border-t border-zinc-200 pt-4 mt-4" },
+            React.createElement(ThemeSwitcher, { value: theme, onChange: function (v) { setTheme(v); } })
           ),
           // About Lunar Lander section (collapsible)
           React.createElement(
